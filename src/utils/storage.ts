@@ -1,7 +1,7 @@
 
 import { Report, DroneModel } from '../types';
 import { format } from 'date-fns';
-import jsPDF from 'jspdf';
+import { jsPDF } from "jspdf";
 import 'jspdf-autotable';
 
 // LocalStorage keys
