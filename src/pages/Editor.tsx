@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -118,6 +117,8 @@ const Editor = () => {
           </p>
         </div>
         <div className="px-4 py-5 sm:p-6">
+          <WeatherDisplay onWeatherUpdate={setWeatherData} />
+
           <div className="mb-6">
             <label htmlFor="report-name" className="block text-sm font-medium text-gray-700 mb-2">
               Название отчета
@@ -145,10 +146,6 @@ const Editor = () => {
               onSelect={setSelectedTemplate}
               droneModelId={selectedDrone.id}
             />
-          )}
-
-          {weatherData && (
-            <WeatherDisplay onWeatherUpdate={setWeatherData} />
           )}
 
           {selectedDrone && (
