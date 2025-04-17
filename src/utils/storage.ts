@@ -1,8 +1,5 @@
 
 import { Report } from '../types';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
-import { format } from 'date-fns';
 
 // LocalStorage keys
 const REPORTS_KEY = 'drone-flight-reports';
@@ -31,17 +28,6 @@ export const deleteReport = (id: string): void => {
   const reports = getReports();
   const updatedReports = reports.filter(report => report.id !== id);
   localStorage.setItem(REPORTS_KEY, JSON.stringify(updatedReports));
-};
-
-// Format date to dd.mm.yyyy format
-export const formatDateString = (dateString: string): string => {
-  try {
-    const date = new Date(dateString);
-    return format(date, 'dd.MM.yyyy');
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return dateString;
-  }
 };
 
 // Filter reports by date range and drone model
@@ -76,82 +62,14 @@ export const sortReportsByDate = (reports: Report[], ascending = true): Report[]
   });
 };
 
-// Generate PDF data for a report
+// Mock function to generate PDF data
 export const generatePDF = (report: Report): string => {
-  try {
-    const doc = new jsPDF();
-    
-    // Add title
-    doc.setFontSize(18);
-    doc.text(`Отчет о полете БПЛА: ${report.name}`, 14, 20);
-    
-    // Add date
-    doc.setFontSize(12);
-    doc.text(`Дата создания: ${formatDateString(report.createdAt)}`, 14, 30);
-    
-    // Add drone model info
-    doc.text(`Модель дрона: ${report.droneModel.name}`, 14, 40);
-    doc.text(`Серийный номер: ${report.droneModel.serialNumber || 'Не указан'}`, 14, 50);
-    
-    // Add weather data
-    doc.setFontSize(14);
-    doc.text('Метеоданные:', 14, 60);
-    doc.setFontSize(10);
-    doc.text(`Температура: ${report.weatherData.temperature}°C`, 20, 70);
-    doc.text(`Ветер: ${report.weatherData.windSpeed} м/с, ${report.weatherData.windDirection}`, 20, 80);
-    doc.text(`Влажность: ${report.weatherData.humidity}%`, 20, 90);
-    doc.text(`Давление: ${report.weatherData.pressure} гПа`, 20, 100);
-    doc.text(`Состояние: ${report.weatherData.conditions}`, 20, 110);
-    
-    let yPosition = 130;
-    
-    // Add sections
-    report.sections.forEach((section, index) => {
-      // Add a new page if we're getting close to the bottom
-      if (yPosition > 250) {
-        doc.addPage();
-        yPosition = 20;
-      }
-      
-      doc.setFontSize(14);
-      doc.text(`${index + 1}. ${section.title}`, 14, yPosition);
-      yPosition += 10;
-      
-      section.items.forEach((item, itemIndex) => {
-        // Add a new page if we're getting close to the bottom
-        if (yPosition > 270) {
-          doc.addPage();
-          yPosition = 20;
-        }
-        
-        doc.setFontSize(10);
-        
-        // Different format based on the item type
-        if (item.type === 'checkbox') {
-          const checkStatus = item.value ? '☑' : '☐';
-          doc.text(`${checkStatus} ${item.label}`, 20, yPosition);
-        } else if (item.type === 'text') {
-          doc.text(`${item.label}: ${item.value || 'Не заполнено'}`, 20, yPosition);
-        } else if (item.type === 'number') {
-          doc.text(`${item.label}: ${item.value || '0'}`, 20, yPosition);
-        } else if (item.type === 'select') {
-          doc.text(`${item.label}: ${item.value || 'Не выбрано'}`, 20, yPosition);
-        }
-        
-        yPosition += 8;
-      });
-      
-      yPosition += 10;
-    });
-    
-    return doc.output('datauristring');
-  } catch (error) {
-    console.error('Error generating PDF:', error);
-    return '';
-  }
+  // In a real application, this would generate a PDF file
+  // For now, we'll return a mock data URL
+  return `data:application/pdf;base64,JVBERi0xLjcKJeLjz9MKNSAwIG9iago8PC9GaWx0ZXIvRmxhdGVEZWNvZGUvTGVuZ3RoIDM4Pj5zdHJlYW0KeJwr5HIK4TI2UzC2NFcwMlMISeFyDeEK5OICADloBTEKZW5kc3RyZWFtCmVuZG9iago0IDAgb2JqCjw8L0NvbnRlbnRzIDUgMCBSL01lZGlhQm94WzAgMCA1OTUgODQyXS9QYXJlbnQgMiAwIFIvUmVzb3VyY2VzPDwvRm9udDw8L0YxIDYgMCBSPj4+Pi9UcmltQm94WzAgMCA1OTUgODQyXS9UeXBlL1BhZ2U+PgplbmRvYmoKMSAwIG9iago8PC9QYWdlcyAyIDAgUi9UeXBlL0NhdGFsb2c+PgplbmRvYmoKMyAwIG9iago8PC9BdXRob3IoVXNlcikvQ3JlYXRpb25EYXRlKEQ6MjAyMzAyMTUxMjAwMDArMDAnMDAnKS9DcmVhdG9yKE1pY3Jvc29mdCBXb3JkKS9EZXNjcmlwdGlvbigpL0tleXdvcmRzKCkvTW9kRGF0ZShEOjIwMjMwMjE1MTIwMDAwKzAwJzAwJykvUHJvZHVjZXIoKS9TdWJqZWN0KCkvVGl0bGUoKT4+CmVuZG9iago2IDAgb2JqCjw8L0Jhc2VGb250L0hlbHZldGljYS9FbmNvZGluZy9XaW5BbnNpRW5jb2RpbmcvU3VidHlwZS9UeXBlMS9UeXBlL0ZvbnQ+PgplbmRvYmoKMiAwIG9iago8PC9Db3VudCAxL0tpZHNbNCAwIFJdL1R5cGUvUGFnZXM+PgplbmRvYmoKeHJlZgowIDcKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMjEyIDAwMDAwIG4gCjAwMDAwMDA1MDMgMDAwMDAgbiAKMDAwMDAwMDI1NyAwMDAwMCBuIAowMDAwMDAwMTE5IDAwMDAwIG4gCjAwMDAwMDAwMTUgMDAwMDAgbiAKMDAwMDAwMDQxNSAwMDAwMCBuIAp0cmFpbGVyCjw8L0luZm8gMyAwIFIvUm9vdCAxIDAgUi9TaXplIDc+PgpzdGFydHhyZWYKNTU0CiUlRU9GCg==`;
 };
 
-// Generate JSON data
+// Mock function to generate JSON data
 export const generateJSON = (report: Report): string => {
   return JSON.stringify(report, null, 2);
 };

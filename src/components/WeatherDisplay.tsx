@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { WeatherData } from '../types';
-import { fetchWeatherData, setupWeatherRefresh, formatTime } from '../utils/weatherApi';
+import { fetchWeatherData, setupWeatherRefresh } from '../utils/weatherApi';
 import { useToast } from '@/components/ui/use-toast';
 
 interface WeatherDisplayProps {
@@ -47,8 +47,8 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
   const fetchLatestWeather = async () => {
     try {
       setLoading(true);
-      // Now using Krasnoyarsk coordinates defined in weatherApi.ts
-      const weatherData = await fetchWeatherData();
+      // Координаты Москвы (в реальном приложении заменить на геолокацию пользователя)
+      const weatherData = await fetchWeatherData(55.7558, 37.6173);
       setWeather(weatherData);
       onWeatherUpdate(weatherData);
       setError(null);
@@ -66,7 +66,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
     fetchLatestWeather();
 
     // Set up refresh interval
-    const cleanup = setupWeatherRefresh((data) => {
+    const cleanup = setupWeatherRefresh(55.7558, 37.6173, (data) => {
       setWeather(data);
       onWeatherUpdate(data);
     });
@@ -77,7 +77,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
   if (loading && !weather) {
     return (
       <div className="bg-white p-4 rounded-lg shadow mb-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-2">Метеоданные (Красноярск)</h2>
+        <h2 className="text-lg font-medium text-gray-900 mb-2">Метеоданные</h2>
         <div className="animate-pulse flex space-x-4">
           <div className="flex-1 space-y-4 py-1">
             <div className="h-4 bg-gray-200 rounded w-3/4"></div>
@@ -113,7 +113,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-6">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-medium text-gray-900">Метеоданные (Красноярск)</h2>
+        <h2 className="text-lg font-medium text-gray-900">Метеоданные</h2>
         {isOffline && (
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
             Офлайн режим
@@ -152,7 +152,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
         </div>
         <div>
           <p className="text-sm text-gray-500">Обновлено</p>
-          <p className="font-medium">{formatTime(weather.timestamp)}</p>
+          <p className="font-medium">{new Date(weather.timestamp).toLocaleTimeString()}</p>
         </div>
       </div>
       

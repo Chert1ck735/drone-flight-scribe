@@ -1,61 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/Layout';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
-  DialogFooter 
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 const Index = () => {
-  const [wizardStep, setWizardStep] = useState(0);
-  const [showWizard, setShowWizard] = useState(false);
-
-  useEffect(() => {
-    // Check if first time user
-    const hasSeenWizard = localStorage.getItem('hasSeenWizard');
-    if (!hasSeenWizard) {
-      setShowWizard(true);
-    }
-  }, []);
-
-  const handleCloseWizard = () => {
-    localStorage.setItem('hasSeenWizard', 'true');
-    setShowWizard(false);
-  };
-
-  const handleNextStep = () => {
-    if (wizardStep < wizardSteps.length - 1) {
-      setWizardStep(wizardStep + 1);
-    } else {
-      handleCloseWizard();
-    }
-  };
-
-  const wizardSteps = [
-    {
-      title: "Добро пожаловать!",
-      description: "Это редактор форм для генерации отчетов о полетах БПЛА. Давайте познакомимся с основными функциями."
-    },
-    {
-      title: "Создание отчета",
-      description: "Нажмите «Создать отчет», чтобы начать заполнение новой формы для отчета о полете БПЛА."
-    },
-    {
-      title: "Шаблоны",
-      description: "В разделе «Шаблоны» вы можете создавать и редактировать шаблоны отчетов и разделов для быстрого заполнения."
-    },
-    {
-      title: "История отчетов",
-      description: "В разделе «История отчетов» вы можете просмотреть все созданные ранее отчеты, отфильтровать их и экспортировать."
-    }
-  ];
-
   return (
     <Layout>
       <div className="max-w-4xl mx-auto">
@@ -66,7 +14,7 @@ const Index = () => {
           Эта система позволяет создавать, редактировать и экспортировать чек-листы и отчеты о полетах дронов.
         </p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
             <div className="p-6">
               <div className="flex items-center justify-center w-12 h-12 rounded-md bg-blue-500 text-white mb-4">
@@ -126,43 +74,113 @@ const Index = () => {
               </Link>
             </div>
           </div>
+          
+          <div className="bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="p-6">
+              <div className="flex items-center justify-center w-12 h-12 rounded-md bg-yellow-500 text-white mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold mb-2">Справка</h2>
+              <p className="text-gray-600 mb-4">
+                Получите дополнительную информацию о возможностях системы и инструкции по использованию.
+              </p>
+              <button
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-yellow-600 hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+              >
+                Открыть справку
+              </button>
+            </div>
+          </div>
         </div>
 
-        <Button 
-          onClick={() => setShowWizard(true)}
-          variant="outline"
-          className="mt-8"
-        >
-          Показать справку
-        </Button>
-      </div>
-
-      <Dialog open={showWizard} onOpenChange={setShowWizard}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{wizardSteps[wizardStep].title}</DialogTitle>
-            <DialogDescription>
-              {wizardSteps[wizardStep].description}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center py-4">
-            {wizardSteps.map((_, index) => (
-              <div 
-                key={index}
-                className={`h-2 w-2 mx-1 rounded-full ${index === wizardStep ? 'bg-blue-600' : 'bg-gray-300'}`}
-              />
-            ))}
+        <div className="mt-10 bg-blue-50 rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">Функциональные возможности</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Создание разделов формы</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Добавление пунктов в разделы</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Выбор шаблона отчета</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Выбор шаблона раздела</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Автоматическое добавление метеоданных</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Выбор параметров дрона</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Экспорт в PDF и JSON</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-gray-700">Фильтрация и сортировка отчетов</p>
+              </div>
+            </div>
           </div>
-          <DialogFooter>
-            <Button 
-              type="button" 
-              onClick={handleNextStep}
-            >
-              {wizardStep < wizardSteps.length - 1 ? "Далее" : "Завершить"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
     </Layout>
   );
 };
