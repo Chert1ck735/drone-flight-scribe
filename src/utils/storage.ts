@@ -1,8 +1,8 @@
 
-import { Report } from '../types';
+import { Report, DroneModel } from '../types';
+import { format } from 'date-fns';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { format } from 'date-fns';
 
 // LocalStorage keys
 const REPORTS_KEY = 'drone-flight-reports';
@@ -91,7 +91,7 @@ export const generatePDF = (report: Report): string => {
     
     // Add drone model info
     doc.text(`Модель дрона: ${report.droneModel.name}`, 14, 40);
-    doc.text(`Серийный номер: ${report.droneModel.serialNumber || 'Не указан'}`, 14, 50);
+    doc.text(`Серийный номер: ${report.droneModel.specifications.wingspan || 'Не указан'}`, 14, 50);
     
     // Add weather data
     doc.setFontSize(14);
@@ -117,7 +117,7 @@ export const generatePDF = (report: Report): string => {
       doc.text(`${index + 1}. ${section.title}`, 14, yPosition);
       yPosition += 10;
       
-      section.items.forEach((item, itemIndex) => {
+      section.items.forEach((item) => {
         // Add a new page if we're getting close to the bottom
         if (yPosition > 270) {
           doc.addPage();
@@ -129,13 +129,13 @@ export const generatePDF = (report: Report): string => {
         // Different format based on the item type
         if (item.type === 'checkbox') {
           const checkStatus = item.value ? '☑' : '☐';
-          doc.text(`${checkStatus} ${item.label}`, 20, yPosition);
+          doc.text(`${checkStatus} ${item.content}`, 20, yPosition);
         } else if (item.type === 'text') {
-          doc.text(`${item.label}: ${item.value || 'Не заполнено'}`, 20, yPosition);
+          doc.text(`${item.content}: ${item.value || 'Не заполнено'}`, 20, yPosition);
         } else if (item.type === 'number') {
-          doc.text(`${item.label}: ${item.value || '0'}`, 20, yPosition);
+          doc.text(`${item.content}: ${item.value || '0'}`, 20, yPosition);
         } else if (item.type === 'select') {
-          doc.text(`${item.label}: ${item.value || 'Не выбрано'}`, 20, yPosition);
+          doc.text(`${item.content}: ${item.value || 'Не выбрано'}`, 20, yPosition);
         }
         
         yPosition += 8;
