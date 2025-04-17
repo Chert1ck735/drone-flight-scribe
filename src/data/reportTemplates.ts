@@ -12,15 +12,6 @@ export const reportTemplates: ReportTemplate[] = [
     updatedAt: new Date().toISOString(),
   },
   {
-    id: 'template-002',
-    name: 'Краткий чек-лист для miniSIGMA',
-    description: 'Сокращенный чек-лист для проведения полетов на дроне miniSIGMA',
-    sections: [],
-    droneModel: 'drone-001',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
     id: 'template-003',
     name: 'Чек-лист для SurveyDrone X1',
     description: 'Стандартный чек-лист для проведения полетов на дроне SurveyDrone X1',

@@ -1,16 +1,22 @@
 
 import { WeatherData } from '../types';
+import { format } from 'date-fns';
 
-const OPENWEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY'; // Replace with actual API key
+// Replace with your actual OpenWeatherMap API key
+const OPENWEATHER_API_KEY = '5d066958a60d315387d9492393935c19'; 
 const CACHE_KEY = 'cached_weather_data';
 const CACHE_TIMESTAMP_KEY = 'cached_weather_timestamp';
 const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes in milliseconds
 
+// Krasnoyarsk coordinates
+const KRASNOYARSK_LAT = 56.0184;
+const KRASNOYARSK_LON = 92.8672;
+
 // Function to fetch from API
-const fetchFromApi = async (latitude: number, longitude: number): Promise<WeatherData> => {
+const fetchFromApi = async (): Promise<WeatherData> => {
   try {
     const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${OPENWEATHER_API_KEY}`
+      `https://api.openweathermap.org/data/2.5/weather?lat=${KRASNOYARSK_LAT}&lon=${KRASNOYARSK_LON}&units=metric&appid=${OPENWEATHER_API_KEY}`
     );
     
     if (!response.ok) {
@@ -71,11 +77,9 @@ const getCachedData = (): WeatherData | null => {
     const cachedTimestamp = parseInt(cachedTimestampStr);
     const now = Date.now();
     
-    // For development testing, always return cached data
-    // In production, check if the cache is expired
-    // if (now - cachedTimestamp > CACHE_EXPIRY) {
-    //   return null;
-    // }
+    if (now - cachedTimestamp > CACHE_EXPIRY) {
+      return null;
+    }
     
     return JSON.parse(cachedDataStr) as WeatherData;
   } catch (error) {
@@ -99,8 +103,30 @@ const generateMockData = (): WeatherData => {
   };
 };
 
+// Format date to dd.mm.yyyy
+export const formatDate = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return format(date, 'dd.MM.yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return dateString;
+  }
+};
+
+// Format time to HH:mm
+export const formatTime = (dateString: string): string => {
+  try {
+    const date = new Date(dateString);
+    return format(date, 'HH:mm');
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return '';
+  }
+};
+
 // The main function that will be called by components
-export const fetchWeatherData = async (latitude: number, longitude: number): Promise<WeatherData> => {
+export const fetchWeatherData = async (): Promise<WeatherData> => {
   // First, check for cached data
   const cachedData = getCachedData();
   
@@ -108,7 +134,7 @@ export const fetchWeatherData = async (latitude: number, longitude: number): Pro
   if (navigator.onLine) {
     try {
       // Try to fetch fresh data
-      const freshData = await fetchFromApi(latitude, longitude);
+      const freshData = await fetchFromApi();
       return freshData;
     } catch (error) {
       console.warn('Failed to fetch fresh weather data. Using cached data.', error);
@@ -131,11 +157,11 @@ export const fetchWeatherData = async (latitude: number, longitude: number): Pro
 };
 
 // Function to auto-refresh weather data in the background (call this on app init)
-export const setupWeatherRefresh = (latitude: number, longitude: number, onUpdate: (data: WeatherData) => void) => {
+export const setupWeatherRefresh = (onUpdate: (data: WeatherData) => void) => {
   const refreshWeather = async () => {
     if (navigator.onLine) {
       try {
-        const data = await fetchWeatherData(latitude, longitude);
+        const data = await fetchWeatherData();
         onUpdate(data);
       } catch (error) {
         console.error('Auto-refresh weather error:', error);
