@@ -1,8 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { WeatherData } from '../types';
-import { fetchWeatherData, setupWeatherRefresh } from '../utils/weatherApi';
-import { useToast } from '@/components/ui/use-toast';
+import { fetchWeatherData } from '../utils/weatherApi';
 
 interface WeatherDisplayProps {
   onWeatherUpdate: (weatherData: WeatherData) => void;
@@ -12,69 +11,28 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isOffline, setIsOffline] = useState(!navigator.onLine);
-  const { toast } = useToast();
 
-  // Handle online/offline status
   useEffect(() => {
-    const handleOnline = () => {
-      setIsOffline(false);
-      toast({
-        title: "Соединение восстановлено",
-        description: "Получение актуальных метеоданных...",
-      });
-      fetchLatestWeather();
+    const getWeatherData = async () => {
+      try {
+        setLoading(true);
+        // Using fixed coordinates for the example
+        // In a real app, you would use geolocation or let the user input coordinates
+        const weatherData = await fetchWeatherData(55.7558, 37.6173);
+        setWeather(weatherData);
+        onWeatherUpdate(weatherData);
+      } catch (err) {
+        setError('Не удалось загрузить данные о погоде');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleOffline = () => {
-      setIsOffline(true);
-      toast({
-        title: "Нет подключения к интернету",
-        description: "Используются сохраненные метеоданные",
-        variant: "destructive",
-      });
-    };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, [toast]);
-
-  const fetchLatestWeather = async () => {
-    try {
-      setLoading(true);
-      // Координаты Москвы (в реальном приложении заменить на геолокацию пользователя)
-      const weatherData = await fetchWeatherData(55.7558, 37.6173);
-      setWeather(weatherData);
-      onWeatherUpdate(weatherData);
-      setError(null);
-    } catch (err) {
-      setError('Не удалось загрузить данные о погоде');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Set up initial fetch and refresh interval
-  useEffect(() => {
-    // Initial fetch
-    fetchLatestWeather();
-
-    // Set up refresh interval
-    const cleanup = setupWeatherRefresh(55.7558, 37.6173, (data) => {
-      setWeather(data);
-      onWeatherUpdate(data);
-    });
-
-    return cleanup;
+    getWeatherData();
   }, [onWeatherUpdate]);
 
-  if (loading && !weather) {
+  if (loading) {
     return (
       <div className="bg-white p-4 rounded-lg shadow mb-6">
         <h2 className="text-lg font-medium text-gray-900 mb-2">Метеоданные</h2>
@@ -91,14 +49,14 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
     );
   }
 
-  if (error && !weather) {
+  if (error) {
     return (
       <div className="bg-red-50 p-4 rounded-lg shadow mb-6">
         <h2 className="text-lg font-medium text-red-700 mb-2">Ошибка</h2>
         <p className="text-red-500">{error}</p>
         <button 
           className="mt-2 text-sm text-blue-600 hover:text-blue-800"
-          onClick={fetchLatestWeather}
+          onClick={() => window.location.reload()}
         >
           Попробовать снова
         </button>
@@ -112,15 +70,7 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
 
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-6">
-      <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-medium text-gray-900">Метеоданные</h2>
-        {isOffline && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            Офлайн режим
-          </span>
-        )}
-      </div>
-      
+      <h2 className="text-lg font-medium text-gray-900 mb-2">Метеоданные</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div>
           <p className="text-sm text-gray-500">Температура</p>
@@ -154,26 +104,6 @@ const WeatherDisplay: React.FC<WeatherDisplayProps> = ({ onWeatherUpdate }) => {
           <p className="text-sm text-gray-500">Обновлено</p>
           <p className="font-medium">{new Date(weather.timestamp).toLocaleTimeString()}</p>
         </div>
-      </div>
-      
-      <div className="mt-2 text-right">
-        <button 
-          className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-          onClick={fetchLatestWeather}
-          disabled={loading || isOffline}
-        >
-          {loading ? (
-            <>
-              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Обновление...
-            </>
-          ) : (
-            'Обновить данные'
-          )}
-        </button>
       </div>
     </div>
   );
